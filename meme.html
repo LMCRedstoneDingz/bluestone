@@ -20,7 +20,8 @@
 		<script>
 			var img = document.body.getElementsByTagName("img")[0];
 			var src = window.location.hash.substr(1);
-			if (src) {
+			if (src && src.length > 0) {
+				alert("beep! " + src.length);
 				img.src = src;
 			}
 		</script>
