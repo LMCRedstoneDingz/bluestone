@@ -14,14 +14,12 @@
 		</style>
 	</head>
 	<body>
-		<img>
-		</img src="https://s3.amazonaws.com/images.seroundtable.com/t-Screen-shot-2011-03-02-a-1299072351.png">
+		<img src="https://s3.amazonaws.com/images.seroundtable.com/t-Screen-shot-2011-03-02-a-1299072351.png">
 		<noscript>Javascript is required.</noscript>
 		<script>
 			var img = document.body.getElementsByTagName("img")[0];
 			var src = window.location.hash.substr(1);
-			if (src && src.length > 0) {
-				alert("beep! " + src.length);
+			if (src) {
 				img.src = src;
 			}
 		</script>
