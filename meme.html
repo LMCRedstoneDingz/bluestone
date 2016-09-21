@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>RadnomShit 001</title>
+		<style>
+			* {
+			  margin: 0px;
+			}
+			
+			img {
+			  width: 100%;
+			  height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<img>
+			<noscript>Javascript is required.</noscript>
+		</img>
+		<script>
+			var img = document.body.getElementsByTagName("img")[0];
+			img.src = window.location.hash.substr(1) | "https://s3.amazonaws.com/images.seroundtable.com/t-Screen-shot-2011-03-02-a-1299072351.png";
+		</script>
+	</body>
+</html>
