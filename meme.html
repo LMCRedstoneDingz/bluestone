@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>RadnomShit 001</title>
+		<title>Meme</title>
 		<style>
 			* {
 			  margin: 0px;
@@ -19,7 +19,8 @@
 		<noscript>Javascript is required.</noscript>
 		<script>
 			var img = document.body.getElementsByTagName("img")[0];
-			img.src = window.location.hash.substr(1) || img.src;
+			alert(window.location.hash.substr(1));
+			img.src = window.location.hash.substr(1);
 		</script>
 	</body>
 </html>
