@@ -19,8 +19,10 @@
 		<noscript>Javascript is required.</noscript>
 		<script>
 			var img = document.body.getElementsByTagName("img")[0];
-			alert(window.location.hash.substr(1));
-			img.src = window.location.hash.substr(1);
+			var src = window.location.hash.substr(1);
+			if (src) {
+				img.src = src;
+			}
 		</script>
 	</body>
 </html>
