@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ClassiCube Terrain Tool</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="../favicon.ico">
+  </head>
+  <body>
+    <noscript>Javascript is required</noscript>
+    <canvas id="canvas"></canvas>
+    <script>
+      (function(){
+        var canvas = document.getElementById("canvas");
+        var context = canvas.getContext("2d");
+        
+        var varibles = get();
+        
+        canvas.width = canvas.height = 1024;
+        
+        if (varibles[src]) {
+          var img = new Image();
+          
+          img.src = varibles[src];
+          
+          img.addEventListener("load", function() {
+            context.save();
+            context.scale(img.width/1024,img.height/1024);
+            context.drawImage(img, 0, 0);
+            context.restore();
+            
+            var nimg = new Image();
+            nimg.src = "numbers.png";
+            
+            img.addEventListener("load", function() {
+              context.drawImage(nimg, 0, 0);
+            });
+          });
+        }
+        
+        function get() {
+          var varibles = window.location.search.split("&");
+          var got = {};
+          for (var i = 0; i < varibles.length; i++) {
+            var varible = varibles[i].split("=");
+            got[varible[0]] = varible[1];
+          }
+          return got;
+        }
+      })();
+  </body>
+</html>
