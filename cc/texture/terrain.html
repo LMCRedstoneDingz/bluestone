@@ -37,7 +37,7 @@
         }
         
         function get() {
-          var varibles = window.location.search.split("&");
+          var varibles = window.location.search.substring(1).split("&");
           var got = {};
           for (var i = 0; i < varibles.length; i++) {
             var varible = varibles[i].split("=");
