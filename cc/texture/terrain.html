@@ -16,10 +16,10 @@
         
         canvas.width = canvas.height = 1024;
         
-        if (varibles[src]) {
+        if (varibles["src"]) {
           var img = new Image();
           
-          img.src = varibles[src];
+          img.src = varibles["src"];
           
           img.addEventListener("load", function() {
             context.save();
