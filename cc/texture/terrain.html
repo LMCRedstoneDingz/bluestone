@@ -22,6 +22,7 @@
         
         if (varibles["src"]) {
           var img = new Image();
+          var nimg = new Image();
           
           img.src = varibles["src"];
           
@@ -31,7 +32,6 @@
             context.drawImage(img, 0, 0);
             context.restore();
             
-            var nimg = new Image();
             nimg.src = "numbers.png";
             
             img.addEventListener("load", function() {
