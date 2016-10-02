@@ -11,23 +11,25 @@
     <script>
         var canvas = document.createElement("canvas");
         var context = canvas.getContext("2d");
-        var outputimg = document.getElementById("output");
         
-        var varibles = get();
+        var $_GET = get();
         
         canvas.width = canvas.height = 1024;
         context.imageSmoothingEnabled = false;
         
         context.clearRect(0, 0, 1024, 1024);
         
-        if (varibles["src"]) {
+        if ($_GET["src"]) {
           var img = new Image();
           img.crossOrigin = "anonymous";
           
           var nimg = new Image();
           nimg.crossOrigin = "anonymous";
           
-          img.src = varibles["src"];
+          var oimg = document.getElementById("output");
+          oimg.crossOrigin = "anonymous";
+          
+          img.src = $_GET["src"];
           
           img.addEventListener("load", function() {
             context.save();
@@ -40,7 +42,7 @@
             nimg.addEventListener("load", function() {
               context.drawImage(nimg, 0, 0);
               
-              outputimg.src = canvas.toDataUrl();
+              oimg.src = canvas.toDataURL();
             });
           });
         }
