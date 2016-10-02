@@ -7,10 +7,11 @@
   </head>
   <body>
     <noscript>Javascript is required</noscript>
-    <canvas id="canvas"></canvas>
+    <img id="output" src="">
     <script>
-        var canvas = document.getElementById("canvas");
+        var canvas = document.createElement("canvas");
         var context = canvas.getContext("2d");
+        var outputimg = document.getElementById("output");
         
         var varibles = get();
         
@@ -38,6 +39,8 @@
             
             nimg.addEventListener("load", function() {
               context.drawImage(nimg, 0, 0);
+              
+              outputimg.src = canvas.toDataUrl();
             });
           });
         }
