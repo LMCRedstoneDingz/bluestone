@@ -16,6 +16,8 @@
         
         canvas.width = canvas.height = 1024;
         
+        context.clearRect(0, 0, 1024, 1024);
+        
         if (varibles["src"]) {
           var img = new Image();
           
@@ -23,7 +25,7 @@
           
           img.addEventListener("load", function() {
             context.save();
-            context.scale(img.width/1024,img.height/1024);
+            context.scale(1024/img.width,1024/img.height);
             context.drawImage(img, 0, 0);
             context.restore();
             
