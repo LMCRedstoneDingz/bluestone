@@ -15,14 +15,16 @@
         var varibles = get();
         
         canvas.width = canvas.height = 1024;
-        
         context.imageSmoothingEnabled = false;
         
         context.clearRect(0, 0, 1024, 1024);
         
         if (varibles["src"]) {
           var img = new Image();
+          img.crossOrigin = "anonymous";
+          
           var nimg = new Image();
+          nimg.crossOrigin = "anonymous";
           
           img.src = varibles["src"];
           
