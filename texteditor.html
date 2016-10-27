@@ -1,0 +1,250 @@
+<html>
+  <head>
+    <title>Online Notepad</title>
+  </head>
+  <body>
+    <div id="file">
+      <p>File: <input type="text" id="filename" disabled></p>
+      <p>(Ctrl+N) <input type="button" id="filenewbutton" value="New File" disabled> (Ctrl+L) <input type="button" id="fileloadbutton" value="Load File" disabled> (Ctrl+D) <input type="button" id="filedeletebutton" value="Delete File" disabled></p>
+    </div>
+    <div id="text">
+      <p>(Ctrl+S) <input type="button" id="textsavebutton" value="Save" disabled> (Ctrl+O) <input type="button" id="textclosebutton" value="Close" disabled> (Ctrl+D) <input type="button" id="textdeletebutton" value="Delete" disabled> <a id="textexportlink">Export</a></p>
+      <textarea id="textarea" disabled></textarea>
+    </div>
+    <script>
+      var file = document.getElementById("file"),
+          filename = document.getElementById("filename"),
+          fileloadbutton = document.getElementById("fileloadbutton"),
+          filenewbutton = document.getElementById("filenewbutton"),
+          filedeletebutton = document.getElementById("filedeletebutton"),
+          text = document.getElementById("text"),
+          textarea = document.getElementById("textarea"),
+          textsavebutton = document.getElementById("textsavebutton"),
+          textclosebutton = document.getElementById("textclosebutton"),
+          textdeletebutton = document.getElementById("textdeletebutton"),
+          textexportlink = document.getElementById("textexportlink");
+      
+      requestAnimationFrame(resize);
+      
+      var filenameValue = "";
+      
+      closeFile();
+      
+      filename.addEventListener("keydown", function(event) {
+        if (event.key == "Enter") {
+          if (filename.value.length > 0) {
+            filenameValue = filename.value;
+            filename.value = "";
+            if (loadFile(filenameValue)) {
+              openFile();
+            } else {
+              alert("File doesn't exist!");
+            }
+          }
+        } else if (event.ctrlKey) {
+          if (filename.value.length > 0) {
+            filenameValue = filename.value;
+            filename.value = "";
+            if(event.key == "n") {
+              if (newFile(filenameValue)) {
+                openFile();
+              } else {
+                alert("File already exists!");
+              }
+            } else if (event.key == "l") {
+              if (loadFile(filenameValue)) {
+                openFile();
+              } else {
+                alert("File doesn't exist!");
+              }
+            } else if (event.key == "d") {
+              if (deleteFile(filenameValue)) {
+                alert("File deleted!");
+              } else {
+                alert("File doesn't exist!");
+              }
+            }
+          }
+        }
+      });
+      
+      filenewbutton.addEventListener("click", function(event) {
+        if (filename.value.length > 0) {
+          filenameValue = filename.value;
+          filename.value = "";
+          if (newFile(filenameValue)) {
+            openFile();
+          } else {
+            alert("File already exist!");
+          }
+        }
+      });
+      
+      fileloadbutton.addEventListener("click", function(event) {
+        if (filename.value.length > 0) {
+          filenameValue = filename.value;
+          filename.value = "";
+          if (loadFile(filenameValue)) {
+            openFile();
+          } else {
+            alert("File doesn't exist!");
+          }
+        }
+      });
+      
+      filedeletebutton.addEventListener("click", function(event) {
+        if (filename.value.length > 0) {
+          filenameValue = filename.value;
+          filename.value = "";
+          if (loadFile(filenameValue)) {
+            alert("File deleted!");
+          } else {
+            alert("File doesn't exist!");
+          }
+        }
+      });
+      
+      textarea.autocomplete = "off";
+      textarea.autocorrect = "off";
+      textarea.autocapitalize = "off";
+      textarea.spellcheck = "off";
+      textarea.style.fontFamily = "Lucida Console";
+      textarea.style.fontSize = "14px";
+      
+      textarea.addEventListener("keydown", function(event) {
+        if (event.ctrlKey) {
+          if(event.key == "s") {
+            if (saveFile(filenameValue)) {
+              alert("File saved!");
+            } else {
+              alert("File deleted!");
+              closeFile();
+            }
+          } else if (event.key == "o") {
+            if (saveFile(filenameValue)) {
+              alert("File saved!");
+            } else {
+              alert("File deleted!");
+            }
+            closeFile();
+          } else if (event.key == "d") {
+            deleteFile(filenameValue);
+            alert("File deleted!");
+            closeFile();
+          }
+        }
+      });
+      
+      textsavebutton.addEventListener("click", function(event) {
+        if (saveFile(filenameValue)) {
+          alert("File saved!");
+        } else {
+          alert("File deleted!");
+          closeFile();
+        }
+      });
+      
+      textclosebutton.addEventListener("click", function(event) {
+        if (saveFile(filenameValue)) {
+          alert("File saved!");
+        } else {
+          alert("File deleted!");
+        }
+        closeFile();
+      });
+      
+      textdeletebutton.addEventListener("click", function(event) {
+        deleteFile(filenameValue);
+        alert("File deleted!");
+        closeFile();
+      });
+      
+      function resize() {
+        textarea.cols = Math.floor(window.innerWidth/8-6);
+        textarea.rows = Math.floor(window.innerHeight/15-2);
+        requestAnimationFrame(resize);
+      }
+      
+      function newFile(filenameValue) {
+        var files = JSON.parse(localStorage.getItem("files") || "{}");
+        if (files[filenameValue]) {
+          return false;
+        }
+          files[filenameValue] = "New file..."
+        textarea.value = files[filenameValue];
+        textexportlink.href = "data:text/plain,"+files[filenameValue];
+        textexportlink.download = filenameValue;
+        localStorage.setItem("files", JSON.stringify(files));
+        return true;
+      }
+      
+      function loadFile(filenameValue) {
+        var files = JSON.parse(localStorage.getItem("files") || "{}");
+        if (!files[filenameValue] || files[filenameValue].length < 1) {
+          if (files[filenameValue] && files[filenameValue].length < 1) {
+            deleteFile(filenameValue);
+          }
+          return false;
+        }
+        textarea.value = files[filenameValue];
+        textexportlink.href = "data:text/plain,"+files[filenameValue];
+        textexportlink.download = filenameValue;
+        localStorage.setItem("files", JSON.stringify(files));
+        return true;
+      }
+      
+      function saveFile(filenameValue) {
+        if (textarea.value < 1) {
+          deleteFile(filenameValue);
+          return false;
+        }
+        var files = JSON.parse(localStorage.getItem("files") || "{}");
+        files[filenameValue] = textarea.value;
+        textexportlink.href = "data:text/plain,"+files[filenameValue];
+        textexportlink.download = filenameValue;
+        localStorage.setItem("files", JSON.stringify(files));
+        return true;
+      }
+      
+      function deleteFile(filenameValue) {
+        var files = JSON.parse(localStorage.getItem("files") || "{}");
+        if (!files[filenameValue]) {
+          return false;
+        }
+        files[filenameValue] = undefined;
+        localStorage.setItem("files", JSON.stringify(files));
+        return true;
+      }
+      
+      function openFile() {
+        filename.disabled = true;
+        fileloadbutton.disabled = true;
+        filedeletebutton.disabled = true;
+        filenewbutton.disabled = true;
+        
+        file.style.display = "none";
+        text.style.display = "block";
+        
+        textarea.disabled = false;
+        textsavebutton.disabled = false;
+        textclosebutton.disabled = false;
+        textdeletebutton.disabled = false;
+      }
+      
+      function closeFile() {
+        textarea.disabled = true;
+        textsavebutton.disabled = true;
+        textclosebutton.disabled = true;
+        textdeletebutton.disabled = true;
+        
+        text.style.display = "none";
+        file.style.display = "block";
+        
+        filename.disabled = false;
+        fileloadbutton.disabled = false;
+        filedeletebutton.disabled = false;
+        filenewbutton.disabled = false;
+      }
+    </script>
+  </body>
+</html>
