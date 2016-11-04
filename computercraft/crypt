@@ -1,0 +1,100 @@
+if not fs.exists(shell.resolve("aes")) then
+  shell.run("wget","https://git.io./aeslua","aes")
+end
+if not aes then
+  if not os.loadAPI(shell.resolve("aes")) then
+    printError("Failed to load AES.")
+    return
+  end
+end
+
+local tArgs = {...}
+
+if #tArgs < 4 or (tArgs[1] ~= "encrypt" and tArgs[1] ~= "decrypt") then
+  printError("Usage: "..shell.getRunningProgram().." <encrypt/decrypt> <from file/dir> <to> <password>")
+  return
+end
+
+if not fs.exists(shell.resolve(tArgs[2])) then
+  printError("File doesn't exist.")
+  return
+end
+
+if fs.exists(shell.resolve(tArgs[3])) then
+  fs.delete(shell.resolve(tArgs[3]))
+end
+
+function getTruePath(path)
+  path = "/"..path.."/"
+  repeat
+    path = path:gsub("//","/")
+  until not path:find("//")
+  return path
+end
+
+function recursiveLookup(path)
+  local content
+  if fs.isReadOnly(path) then
+    return
+  end
+  if fs.isDir(path) then
+    content = {
+      isDir = true,
+      content = {},
+    }
+    for i,name in pairs(fs.list(path)) do
+      content.content[name] = recursiveLookup(path..name.."/")
+    end
+  else
+    content = {
+      isDir = false,
+      content = ""
+    }
+    local file = fs.open(path,"r")
+    if file then
+      content.content = file.readAll()
+      file.close()
+    end
+  end
+  return content
+end
+
+function recursiveDownload(path,files)
+  if files.isDir then
+    for name,content in pairs(files.content) do
+      recursiveDownload(path..name.."/",content)
+    end
+  else
+    local file = fs.open(path,"w")
+    if file then
+      file.write(files.content)
+      file.close()
+    end
+  end
+  return
+end
+
+if tArgs[1] == "encrypt" then
+  local to = fs.open(getTruePath(shell.resolve(tArgs[3])),"w")
+  if not to then
+    printError("Failed to open destination file.")
+    return
+  end
+  to.write(aes.encrypt(tArgs[4],textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2]))))))
+  to.close()
+  printError("Encryption complete!")
+else
+  local from = fs.open(getTruePath(shell.resolve(tArgs[2])),"r")
+  if not from then
+    printError("Failed to open source file.")
+    from.close()
+    return
+  end
+  local files = textutils.unserialize(aes.decrypt(tArgs[4],from.readAll()))
+  if files.isDir then
+    fs.makeDir(shell.resolve(tArgs[3]))
+  end
+  recursiveDownload(getTruePath(shell.resolve(tArgs[3])),files)
+  from.close()
+  printError("Decryption complete!")
+end
