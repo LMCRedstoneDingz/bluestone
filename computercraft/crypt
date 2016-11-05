@@ -41,9 +41,13 @@ local function getTruePath(path)
   return path
 end
 
-local function recursiveLookup(path)
+local function yield()
   os.queueEvent("yield")
   os.pullEventRaw("yield")
+end
+
+local function recursiveLookup(path)
+  yield()
   local content
   if fs.isReadOnly(path) then
     return
@@ -72,8 +76,7 @@ local function recursiveLookup(path)
 end
 
 local function recursiveDownload(path,files)
-  os.queueEvent("yield")
-  os.pullEventRaw("yield")
+  yield()
   if files.isDir then
     for name,content in pairs(files.content) do
       recursiveDownload(path..name.."/",content)
@@ -102,27 +105,16 @@ local function toHex(str)
   local hex = ""
   for i=1,#str,1 do
     hex = hex..lpad(string.format("%x",string.byte(str:sub(i,i))),"0",2)
-    term.setCursorPos(1,h)
-    term.clearLine()
-    term.setCursorPos(1,h)
-    term.write("En-Hexing: "..math.floor((i/#str)*100).."%")
-    os.queueEvent("yield")
-    os.pullEventRaw("yield")
+    yield()
   end
   return hex
 end
 
-local function fromHex(hex,callback)
+local function fromHex(hex)
   local str = ""
   for i=1,#hex,2 do
     str = str..string.char(tonumber(hex:sub(i,i+1),16))
-    term.setCursorPos(1,h)
-    term.clearLine()
-    term.setCursorPos(1,h)
-    term.write("De-Hexing: "..math.floor((i/#hex)*100).."%")
-    callback(i/#str)
-    os.queueEvent("yield")
-    os.pullEventRaw("yield")
+    yield()
   end
   return str
 end
@@ -133,7 +125,7 @@ if tArgs[1] == "encrypt" then
     printError("Failed to open destination file.")
     return
   end
-  to.write(toHex(aes.encrypt(tArgs[4],textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2])))))))
+  to.write(toHex(aes.encrypt(tArgs[4],data.deflate(textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2]))))))))
   to.close()
   printError("Encryption complete!")
 else
@@ -145,7 +137,7 @@ else
   end
   local files
   local ok, err = pcall(function()
-    files = textutils.unserialize(aes.decrypt(tArgs[4],fromHex(from.readAll())))
+    local files = textutils.unserialize(data.inflate(aes.decrypt(tArgs[4],fromHex(from.readAll()))))
   end)
   from.close()
   if not (ok and files) then
