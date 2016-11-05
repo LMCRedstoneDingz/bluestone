@@ -24,8 +24,8 @@ end
 local tArgs = {...}
 
 if #tArgs < 4 or (tArgs[1] ~= "encrypt" and tArgs[1] ~= "decrypt") then
-  printError("Usage: "..shell.getRunningProgram().." encrypt <from file/dir> <to file> <password>")
-  printError("       "..shell.getRunningProgram().." decrypt <from file> <to file/dir> <password>")
+  printError("Usage: "..shell.getRunningProgram().." encrypt <from> <to> <password>")
+  printError("       "..shell.getRunningProgram().." decrypt <from> <to> <password>")
   return
 end
 
