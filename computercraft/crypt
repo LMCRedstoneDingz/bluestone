@@ -102,6 +102,8 @@ local function toHex(str)
   local hex = ""
   for i=1,#str,1 do
     hex = hex..lpad(string.format("%x",string.byte(str:sub(i,i))),"0",2)
+    os.queueEvent("yield")
+    os.pullEventRaw("yield")
   end
   return hex
 end
@@ -110,6 +112,8 @@ local function fromHex(hex)
   local str = ""
   for i=1,#hex,2 do
     str = str..string.char(tonumber(hex:sub(i,i+1),16))
+    os.queueEvent("yield")
+    os.pullEventRaw("yield")
   end
   return str
 end
