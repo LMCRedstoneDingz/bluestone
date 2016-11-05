@@ -91,10 +91,10 @@ else
     return
   end
   local files = textutils.unserialize(aes.decrypt(tArgs[4],from.readAll()))
+  from.close()
   if files.isDir then
     fs.makeDir(shell.resolve(tArgs[3]))
   end
   recursiveDownload(getTruePath(shell.resolve(tArgs[3])),files)
-  from.close()
   printError("Decryption complete!")
 end
