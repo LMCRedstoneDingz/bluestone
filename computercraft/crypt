@@ -135,7 +135,7 @@ else
     files = textutils.unserialize(aes.decrypt(tArgs[4],fromHex(from.readAll())))
   end)
   from.close()
-  if not (ok or files) then
+  if not (ok and files) then
     printError("Failed to read source file.")
     return
   end
