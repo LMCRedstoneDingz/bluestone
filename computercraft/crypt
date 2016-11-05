@@ -136,7 +136,7 @@ else
   end)
   from.close()
   if not (ok or files) then
-    printError("File is corrupt!")
+    printError("Failed to read source file.")
     return
   end
   if files.isDir then
