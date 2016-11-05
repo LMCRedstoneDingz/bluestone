@@ -94,7 +94,7 @@ if tArgs[1] == "encrypt" then
     printError("Failed to open destination file.")
     return
   end
-  to.write(aes.encrypt(tArgs[4],textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2]))))))
+  to.write(aes.encrypt(tArgs[4],deflate(textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2])))))))
   to.close()
   printError("Encryption complete!")
 else
@@ -104,7 +104,7 @@ else
     from.close()
     return
   end
-  local files = textutils.unserialize(aes.decrypt(tArgs[4],from.readAll()))
+  local files = textutils.unserialize(inflate(aes.decrypt(tArgs[4],from.readAll())))
   from.close()
   if files.isDir then
     fs.makeDir(shell.resolve(tArgs[3]))
