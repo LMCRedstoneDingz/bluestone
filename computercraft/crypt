@@ -130,8 +130,17 @@ else
     from.close()
     return
   end
-  local files = textutils.unserialize(aes.decrypt(tArgs[4],fromHex(from.readAll())))
+  local files
+  local ok, err = pcall(function()
+    files = textutils.unserialize(aes.decrypt(tArgs[4],fromHex(from.readAll())))
+  end)
   from.close()
+  if not ok then
+    printError("File is corrupt! "..err)
+  end
+  if not files then
+    printError("File is corrupt!")
+  end
   if files.isDir then
     fs.makeDir(shell.resolve(tArgs[3]))
   end
