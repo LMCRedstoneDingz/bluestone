@@ -1,5 +1,18 @@
 if not fs.exists(shell.resolve("aes")) then
-  shell.run("wget","https://git.io/aeslua","aes")
+  local httpfile = http.get("https://git.io/aeslua")
+  if not httpfile then
+    printError("Failed to download AES.")
+    return
+  end
+  local file = fs.open(shell.resolve("aes"),"w")
+  if not file then
+    printError("Failed to download AES.")
+    httpfile.close()
+    return
+  end
+  file.write(httpfile.readAll())
+  httpfile.close()
+  file.close()
 end
 if not aes then
   if not os.loadAPI(shell.resolve("aes")) then
