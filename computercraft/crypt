@@ -20,10 +20,6 @@ if not fs.exists(shell.resolve(tArgs[2])) then
   return
 end
 
-if fs.exists(shell.resolve(tArgs[3])) then
-  fs.delete(shell.resolve(tArgs[3]))
-end
-
 local function getTruePath(path)
   path = "/"..path.."/"
   repeat
