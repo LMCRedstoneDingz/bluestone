@@ -137,7 +137,7 @@ else
   end
   local files
   local ok, err = pcall(function()
-    local files = textutils.unserialize(data.inflate(aes.decrypt(tArgs[4],fromHex(from.readAll()))))
+    files = textutils.unserialize(data.inflate(aes.decrypt(tArgs[4],fromHex(from.readAll()))))
   end)
   from.close()
   if not (ok and files) then
