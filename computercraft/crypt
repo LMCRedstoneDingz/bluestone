@@ -24,7 +24,7 @@ if fs.exists(shell.resolve(tArgs[3])) then
   fs.delete(shell.resolve(tArgs[3]))
 end
 
-function getTruePath(path)
+local function getTruePath(path)
   path = "/"..path.."/"
   repeat
     path = path:gsub("//","/")
@@ -32,7 +32,7 @@ function getTruePath(path)
   return path
 end
 
-function recursiveLookup(path)
+local function recursiveLookup(path)
   local content
   if fs.isReadOnly(path) then
     return
@@ -59,7 +59,7 @@ function recursiveLookup(path)
   return content
 end
 
-function recursiveDownload(path,files)
+local function recursiveDownload(path,files)
   if files.isDir then
     for name,content in pairs(files.content) do
       recursiveDownload(path..name.."/",content)
@@ -72,6 +72,20 @@ function recursiveDownload(path,files)
     end
   end
   return
+end
+
+local function inflate(str)
+  if data.inflate then
+    return data.inflate(str)
+  end
+  return str
+end
+
+local function deflate(str)
+  if data.deflate then
+    return data.deflate(str)
+  end
+  return str
 end
 
 if tArgs[1] == "encrypt" then
