@@ -70,16 +70,27 @@ local function recursiveDownload(path,files)
   return
 end
 
-local function inflate(str)
-  if data.inflate then
-    return data.inflate(str)
+local function lpad(str,pad,len)
+  if #str < len then
+    repeat
+      str = pad..str
+    until #str >= len
   end
   return str
 end
 
-local function deflate(str)
-  if data.deflate then
-    return data.deflate(str)
+local function toHex(str)
+  local hex = ""
+  for i=1,#str,1 do
+    hex = hex..lpad(string.format("%x",string.byte(str:sub(i,i))),"0",2)
+  end
+  return hex
+end
+
+local function fromHex(hex)
+  local str = ""
+  for i=1,#hex,2 do
+    str = str..string.char(tonumber(hex:sub(i,i+1),16))
   end
   return str
 end
@@ -90,7 +101,7 @@ if tArgs[1] == "encrypt" then
     printError("Failed to open destination file.")
     return
   end
-  to.write(aes.encrypt(tArgs[4],deflate(textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2])))))))
+  to.write(toHex(aes.encrypt(tArgs[4],textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2])))))))
   to.close()
   printError("Encryption complete!")
 else
@@ -100,7 +111,7 @@ else
     from.close()
     return
   end
-  local files = textutils.unserialize(inflate(aes.decrypt(tArgs[4],from.readAll())))
+  local files = textutils.unserialize(aes.decrypt(tArgs[4],fromHex(from.readAll())))
   from.close()
   if files.isDir then
     fs.makeDir(shell.resolve(tArgs[3]))
