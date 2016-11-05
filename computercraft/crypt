@@ -102,16 +102,25 @@ local function toHex(str)
   local hex = ""
   for i=1,#str,1 do
     hex = hex..lpad(string.format("%x",string.byte(str:sub(i,i))),"0",2)
+    term.setCursorPos(1,h)
+    term.clearLine()
+    term.setCursorPos(1,h)
+    term.write("En-Hexing: "..math.floor((i/#str)*100).."%")
     os.queueEvent("yield")
     os.pullEventRaw("yield")
   end
   return hex
 end
 
-local function fromHex(hex)
+local function fromHex(hex,callback)
   local str = ""
   for i=1,#hex,2 do
     str = str..string.char(tonumber(hex:sub(i,i+1),16))
+    term.setCursorPos(1,h)
+    term.clearLine()
+    term.setCursorPos(1,h)
+    term.write("De-Hexing: "..math.floor((i/#hex)*100).."%")
+    callback(i/#str)
     os.queueEvent("yield")
     os.pullEventRaw("yield")
   end
