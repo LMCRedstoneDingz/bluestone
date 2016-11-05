@@ -141,7 +141,11 @@ else
   end)
   from.close()
   if not (ok and files) then
-    printError("Failed to read source file.")
+    if err then
+      printError("Failed to read source file: "..err)
+    else
+      printError("Failed to read source file.")
+    end
     return
   end
   if files.isDir then
