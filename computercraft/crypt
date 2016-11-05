@@ -42,7 +42,7 @@ local function getTruePath(path)
 end
 
 local function recursiveLookup(path)
-  queueEvent("yield")
+  os.queueEvent("yield")
   os.pullEventRaw("yield")
   print("Uploading \""..path.."\"...")
   local content
@@ -72,7 +72,7 @@ local function recursiveLookup(path)
 end
 
 local function recursiveDownload(path,files)
-  queueEvent("yield")
+  os.queueEvent("yield")
   os.pullEventRaw("yield")
   print("Downloading \""..path.."\"...")
   if files.isDir then
