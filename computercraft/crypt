@@ -49,44 +49,44 @@ end
 
 local function recursiveLookup(path)
   yield()
-  local content
+  local c
   if fs.isReadOnly(path) then
     return
   end
   if fs.isDir(path) then
-    content = {
-      isDir = true,
-      content = {},
+    c = {
+      d = true,
+      c = {},
     }
     for i,name in pairs(fs.list(path)) do
-      content.content[name] = recursiveLookup(path..name.."/")
+      c.c[name] = recursiveLookup(path..name.."/")
     end
   else
-    print("Uploading \""..path:sub(1,#path-1).."\"...")
-    content = {
-      isDir = false,
-      content = ""
+    print("Encrypting \""..path:sub(1,#path-1).."\"...")
+    c = {
+      d = false,
+      c = ""
     }
     local file = fs.open(path,"r")
     if file then
-      content.content = file.readAll()
+      c.c = file.readAll()
       file.close()
     end
   end
-  return content
+  return c
 end
 
 local function recursiveDownload(path,files)
   yield()
-  if files.isDir then
-    for name,content in pairs(files.content) do
+  if files.d then
+    for name,content in pairs(files.c) do
       recursiveDownload(path..name.."/",content)
     end
   else
-    print("Downloading \""..path:sub(1,#path-1).."\"...")
+    print("Decrypting \""..path:sub(1,#path-1).."\"...")
     local file = fs.open(path,"w")
     if file then
-      file.write(files.content)
+      file.write(files.c)
       file.close()
     end
   end
@@ -149,7 +149,7 @@ else
     end
     return
   end
-  if files.isDir then
+  if files.d and not fs.exists(shell.resolve(tArgs[3])) then
     fs.makeDir(shell.resolve(tArgs[3]))
   end
   recursiveDownload(getTruePath(shell.resolve(tArgs[3])),files)
