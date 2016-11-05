@@ -111,7 +111,7 @@ local function fromHex(hex)
   for i=1,#hex,2 do
     str = str..string.char(tonumber(hex:sub(i,i+1),16))
   end
-  return strnot done
+  return str
 end
 
 if tArgs[1] == "encrypt" then
