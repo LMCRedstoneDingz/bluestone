@@ -44,7 +44,6 @@ end
 local function recursiveLookup(path)
   os.queueEvent("yield")
   os.pullEventRaw("yield")
-  print("Uploading \""..path.."\"...")
   local content
   if fs.isReadOnly(path) then
     return
@@ -58,6 +57,7 @@ local function recursiveLookup(path)
       content.content[name] = recursiveLookup(path..name.."/")
     end
   else
+    print("Uploading \""..path:sub(1,#path-1).."\"...")
     content = {
       isDir = false,
       content = ""
@@ -74,12 +74,12 @@ end
 local function recursiveDownload(path,files)
   os.queueEvent("yield")
   os.pullEventRaw("yield")
-  print("Downloading \""..path.."\"...")
   if files.isDir then
     for name,content in pairs(files.content) do
       recursiveDownload(path..name.."/",content)
     end
   else
+    print("Downloading \""..path:sub(1,#path-1).."\"...")
     local file = fs.open(path,"w")
     if file then
       file.write(files.content)
@@ -111,7 +111,7 @@ local function fromHex(hex)
   for i=1,#hex,2 do
     str = str..string.char(tonumber(hex:sub(i,i+1),16))
   end
-  return str
+  return strnot done
 end
 
 if tArgs[1] == "encrypt" then
