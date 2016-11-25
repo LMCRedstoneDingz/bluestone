@@ -128,7 +128,7 @@ if tArgs[1] == "encrypt" then
   end
   to.write(toHex(aes.encrypt(tArgs[4],data.deflate(textutils.serialize(recursiveLookup(getTruePath(shell.resolve(tArgs[2]))))))))
   to.close()
-  printError("Encryption complete!")
+  print("Encryption Complete!")
 else
   local from = fs.open(getTruePath(shell.resolve(tArgs[2])),"r")
   if not from then
@@ -153,5 +153,5 @@ else
     fs.makeDir(shell.resolve(tArgs[3]))
   end
   recursiveDownload(getTruePath(shell.resolve(tArgs[3])),files)
-  printError("Decryption complete!")
+  print("Decryption complete!")
 end
