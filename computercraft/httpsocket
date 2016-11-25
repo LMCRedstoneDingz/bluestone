@@ -1,1 +1,98 @@
+local function handle(server,path,data)
+  local datastr = "?"
+  for var,val in pairs(data) do
+    datastr = datastr..textutils.urlEncode(var).."="..textutils.urlEncode(val).."&"
+  end
+  datastr = datastr:sub(1,#datastr-1)
+  local req = http.get(server..path..datastr)
+  if not req then
+    return {success=false}
+  end
+  local res = textutils.unserialize(req.readAll())
+  req.close()
+  if not res then
+    return {success=false}
+  end
+  return res
+end
 
+local meta = {
+  __index = {
+    lookup = function(sock)
+      if type(sock) ~= "table" then
+        error("Expected table",2)
+      end
+      local res = handle(sock.server,"api",{get="socket",name=sock.name,id=sock.id})
+      return res.success, res.data
+    end,
+    ping = function(sock)
+      if type(sock) ~= "table" then
+        error("Expected table",2)
+      end
+      local res = handle(sock.server,"api/ping",{name=sock.name,id=sock.id})
+      return res.success
+    end,
+    send = function(sock,to,message)
+      if type(sock) ~= "table" or type(to) ~= "string" or type(message) ~= "string" then
+        error("Expected table, string, string",2)
+      end
+      local res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=to,message=message})
+      return res.success, res.data
+    end,
+    receive = function(sock)
+      if type(sock) ~= "table" then
+        error("Expected table",2)
+      end
+      local res = handle(sock.server,"api/receive",{name=sock.name,id=sock.id})
+      return res.success, res.data
+    end,
+    close = function(sock)
+      if type(sock) ~= "table" then
+        error("Expected table",2)
+      end
+      local res = handle(sock.server,"api/disconnect",{name=sock.name,id=sock.id})
+      return res.success
+    end,
+  },
+}
+
+function connect(server,name)
+  local ok, err = http.checkURL(server)
+  local res
+  if not ok then
+    error(err, 2)
+  end
+  res = handle(server,"api",{})
+  if not res.success then
+    return false
+  end
+  res = handle(server,"api/connect",{name=name})
+  if not res.success then
+    return false
+  end
+  local sock = {
+    server = server,
+    name = res.data.name,
+    id = res.data.id,
+  }
+  setmetatable(sock,meta)
+  return sock
+end
+
+function time(server)
+  if type(server) ~= "string" then
+    error("Expected string",2)
+  end
+  local res = handle(server,"api",{get="time"})
+  return res.success, res.data
+end
+
+function lookup(server,name)
+  if type(server) ~= "string" then
+    error("Expected string",2)
+  elseif name and type(name) ~= "string" then
+    error("Expected string, string",2)
+  end
+  local res = handle(server,"api",{get="socket",name=name})
+  return res.success, res.data
+end
