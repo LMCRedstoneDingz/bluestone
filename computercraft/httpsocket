@@ -1,14 +1,14 @@
 local function handle(server,path,data)
-  datastr = "?"
+  local datastr = "?"
   for var,val in pairs(data) do
     datastr = datastr..textutils.urlEncode(var).."="..textutils.urlEncode(val).."&"
   end
-  datastr = datastr:sub(1,#datastr-1)
-  req = http.get(server..path..datastr)
+  local datastr = datastr:sub(1,#datastr-1)
+  local req = http.get(server..path..datastr)
   if not req then
     return {success=false}
   end
-  res = textutils.unserialize(req.readAll())
+  local res = textutils.unserialize(req.readAll())
   req.close()
   if not res then
     return {success=false}
@@ -19,7 +19,8 @@ end
 
 
 function connect(server,name)
-  ok, err = http.checkURL(server)
+  local ok, err = http.checkURL(server)
+  local res
   if not ok then
     error(err, 2)
   end
@@ -39,29 +40,30 @@ function connect(server,name)
   setmetatable(sock,{
     __index = {
       lookup = function()
-        res = handle(sock.server,"api",{get="socket",name=sock.name,id=sock.id})
+        local res = handle(sock.server,"api",{get="socket",name=sock.name,id=sock.id})
         return res.success, res.data
       end,
       ping = function()
-        res = handle(sock.server,"api/ping",{name=sock.name,id=sock.id})
+        local res = handle(sock.server,"api/ping",{name=sock.name,id=sock.id})
         return res.success
       end,
       send = function(to,message)
         if type(to) ~= "string" or type(message) ~= "string" then
           error("Expected string, string",2)
         end
-        res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=to,message=message})
+        local res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=to,message=message})
         return res.success, res.data
       end,
       broadcast = function(message)
         if type(message) ~= "string" then
           error("Expected string",2)
         end
+        local res
         res = handle(sock.server,"api",{get="socket"})
         if not res.success then
           return res.success
         end
-        messages = {}
+        local messages = {}
         for i,v in pairs(res.data) do
           res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=v.name,message=message})
           if not res.success then
@@ -72,11 +74,11 @@ function connect(server,name)
         return true, messages
       end,
       receive = function()
-        res = handle(sock.server,"api/receive",{name=sock.name,id=sock.id})
+        local res = handle(sock.server,"api/receive",{name=sock.name,id=sock.id})
         return res.success, res.data
       end,
       close = function()
-        res = handle(sock.server,"api/disconnect",{name=sock.name,id=sock.id})
+        local res = handle(sock.server,"api/disconnect",{name=sock.name,id=sock.id})
         return res.success
       end,
     },
@@ -88,7 +90,7 @@ function time(server)
   if type(server) ~= "string" then
     error("Expected string",2)
   end
-  res = handle(server,"api",{get="time"})
+  local res = handle(server,"api",{get="time"})
   return res.success, res.data
 end
 
@@ -98,6 +100,6 @@ function lookup(server,name)
   elseif name and type(name) ~= "string" then
     error("Expected string, string",2)
   end
-  res = handle(server,"api",{get="socket",name=name})
+  local res = handle(server,"api",{get="socket",name=name})
   return res.success, res.data
 end
