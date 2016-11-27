@@ -1,3 +1,23 @@
+local function lpad(str,pad,len)
+  return pad:rep(len-#str)..str
+end
+
+local function toHex(message)
+  local hexmessage = ""
+  for i=1,#message,1 do
+    hexmessage = hexmessage..lpad(string.format("%x",string.byte(message:sub(i,i))),"0",2)
+  end
+  return hexmessage
+end
+
+local function fromHex(hexmessage)
+  local message = ""
+  for i=1,#hexmessage,2 do
+    message = message..string.char(tonumber(hexmessage:sub(i,i+1),16))
+  end
+  return message
+end
+
 local function handle(server,path,data)
   local datastr = "?"
   for var,val in pairs(data) do
@@ -51,7 +71,10 @@ function connect(server,name)
         if type(to) ~= "string" or type(message) ~= "string" then
           error("Expected string, string",2)
         end
-        local res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=to,message=message})
+        local res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=to,message=toHex(message)})
+        if res.success then
+          res.data.message = fromHex(res.data.message)
+        end
         return res.success, res.data
       end,
       broadcast = function(message)
@@ -64,17 +87,24 @@ function connect(server,name)
           return res.success
         end
         local messages = {}
+        local hexmessage = toHex(message);
         for i,v in pairs(res.data) do
-          res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=v.name,message=message})
+          res = handle(sock.server,"api/send",{name=sock.name,id=sock.id,to=v.name,message=hexmessage})
           if not res.success then
             return false
           end
+          res.data.message = fromHex(res.data.message)
           table.insert(messages,res.data)
         end
         return true, messages
       end,
       receive = function()
         local res = handle(sock.server,"api/receive",{name=sock.name,id=sock.id})
+        if res.success then
+          for i=1,#res.data,1 do
+            res.data[i].message = fromHex(res.data[i].message)
+          end
+        end
         return res.success, res.data
       end,
       close = function()
