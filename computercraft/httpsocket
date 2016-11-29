@@ -16,8 +16,6 @@ local function handle(server,path,data)
   return res
 end
 
-
-
 function connect(server,name)
   local ok, err = http.checkURL(server)
   local res
